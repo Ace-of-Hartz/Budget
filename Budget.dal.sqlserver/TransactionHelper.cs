@@ -15,7 +15,7 @@ namespace Budget.dal.sqlserver
         {
             get
             {
-                if(this._sqlTransaction == null)
+                if (this._sqlTransaction == null)
                 {
                     this.BeginTransaction(Guid.NewGuid().ToString("N"));
                 }
@@ -33,24 +33,32 @@ namespace Budget.dal.sqlserver
 
         public void BeginTransaction(string transactionName)
         {
-            if (string.IsNullOrWhiteSpace(transactionName)) { this._sqlTransaction = this.SqlConnection.BeginTransaction(); }
-            else { this._sqlTransaction = this.SqlConnection.BeginTransaction(); }
+            if (string.IsNullOrWhiteSpace(transactionName))
+            {
+                this._sqlTransaction = this.SqlConnection.BeginTransaction();
+            }
+            else
+            {
+                this._sqlTransaction = this.SqlConnection.BeginTransaction(transactionName);
+            }
         }
 
         public void RollbackTransactaction()
         {
-            this.SqlTransaction.Rollback();
+            this.SqlTransaction?.Rollback();
         }
 
         public void CommitTransaction()
         {
-            this.SqlTransaction.Commit();
+            this.SqlTransaction?.Commit();
         }
 
         public void Dispose()
         {
-            this.SqlTransaction.Dispose();
-            this.SqlConnection.Dispose();
+            this.SqlTransaction?.Dispose();
+            this.SqlConnection?.Dispose();
+
+            this._sqlTransaction = null;
         }
     }
 }
