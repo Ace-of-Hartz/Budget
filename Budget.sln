@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget", "Budget\Budget.csproj", "{2FA9B0F1-6296-4660-BEA6-383D27B9EC60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget", "Budget\Budget\Budget.csproj", "{2FA9B0F1-6296-4660-BEA6-383D27B9EC60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget.dto", "Budget.dto\Budget.dto.csproj", "{6C448410-1510-40F1-ABBB-B30689315C4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.dto", "Budget\Budget.dto\Budget.dto.csproj", "{6C448410-1510-40F1-ABBB-B30689315C4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget.model", "Budget.model\Budget.model.csproj", "{3CE2BBC5-F28B-4D90-9BD0-BFCF777D3787}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.model", "Budget\Budget.model\Budget.model.csproj", "{3CE2BBC5-F28B-4D90-9BD0-BFCF777D3787}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.dal.i", "Budget.dal.i\Budget.dal.i.csproj", "{FF23B875-AE83-4473-9026-58D6B58B5C53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget.dal.sqlserver", "Budget.dal.sqlserver\Budget.dal.sqlserver.csproj", "{B5D83DA7-63F3-40C7-B209-9835237CA8A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{3CE2BBC5-F28B-4D90-9BD0-BFCF777D3787}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CE2BBC5-F28B-4D90-9BD0-BFCF777D3787}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CE2BBC5-F28B-4D90-9BD0-BFCF777D3787}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF23B875-AE83-4473-9026-58D6B58B5C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF23B875-AE83-4473-9026-58D6B58B5C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF23B875-AE83-4473-9026-58D6B58B5C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF23B875-AE83-4473-9026-58D6B58B5C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5D83DA7-63F3-40C7-B209-9835237CA8A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5D83DA7-63F3-40C7-B209-9835237CA8A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5D83DA7-63F3-40C7-B209-9835237CA8A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5D83DA7-63F3-40C7-B209-9835237CA8A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
