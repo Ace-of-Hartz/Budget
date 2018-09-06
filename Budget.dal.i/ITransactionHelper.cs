@@ -11,7 +11,9 @@ namespace Budget.dal.i
         SqlConnection SqlConnection { get; }
         SqlTransaction SqlTransaction { get; }
 
-        void BeginTransaction(string transactionName);
+        SqlConnection CreateSqlConnection();
+        SqlTransaction BeginTransaction();
+        SqlTransaction BeginTransaction(string transactionName);
         void RollbackTransactaction();
         void CommitTransaction();
     }

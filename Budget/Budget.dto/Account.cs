@@ -10,5 +10,14 @@ namespace Budget.dto
         public string Name { get; set; }
         public Decimal Money { get; set; }
         public string Description { get; set; }
+
+        public Account() { }
+        public Account(Account account)
+        {
+            this.Id = account.Id;
+            this.Name = account.Name;
+            this.Money = account.Money;
+            this.Description = account.Description;
+        }
     }
 }

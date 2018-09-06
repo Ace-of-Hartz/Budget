@@ -8,9 +8,21 @@ namespace Budget.dal.sqlserver
 {
     public class TransactionHelper : ITransactionHelper
     {
-        public string SqlConnectionString { get; }
+        public string SqlConnectionString { get; private set; }
 
-        public SqlConnection SqlConnection { get; }
+        public SqlConnection SqlConnection
+        {
+            get
+            {
+                if (this.SqlConnection == null)
+                {
+                    this.CreateSqlConnection();
+                }
+                return this._sqlConnection;
+            }
+        }
+        private SqlConnection _sqlConnection;
+
         public SqlTransaction SqlTransaction
         {
             get
@@ -22,25 +34,31 @@ namespace Budget.dal.sqlserver
                 return this._sqlTransaction;
             }
         }
-
         private SqlTransaction _sqlTransaction;
 
-        public TransactionHelper(string connectionString)
+        public TransactionHelper() { }
+
+        public SqlConnection CreateSqlConnection()
         {
-            this.SqlConnectionString = connectionString;
-            this.SqlConnection = new SqlConnection(SqlConnectionString);
+            this._sqlConnection = new SqlConnection(this.SqlConnectionString);
+            return this._sqlConnection;
         }
 
-        public void BeginTransaction(string transactionName)
+        public SqlTransaction BeginTransaction()
         {
-            if (string.IsNullOrWhiteSpace(transactionName))
-            {
-                this._sqlTransaction = this.SqlConnection.BeginTransaction();
-            }
-            else
-            {
-                this._sqlTransaction = this.SqlConnection.BeginTransaction(transactionName);
-            }
+            if (this.SqlConnection == null) { this.CreateSqlConnection(); }
+
+            this._sqlTransaction = this.SqlConnection.BeginTransaction();
+            return this._sqlTransaction;
+        }
+
+        public SqlTransaction BeginTransaction(string transactionName)
+        {
+            if (this.SqlConnection == null) { this.CreateSqlConnection(); }
+
+            if (string.IsNullOrWhiteSpace(transactionName)) { this.BeginTransaction(); }
+            else { this._sqlTransaction = this.SqlConnection.BeginTransaction(transactionName); }
+            return this._sqlTransaction;
         }
 
         public void RollbackTransactaction()
@@ -59,6 +77,7 @@ namespace Budget.dal.sqlserver
             this.SqlConnection?.Dispose();
 
             this._sqlTransaction = null;
+            this._sqlConnection = null;
         }
     }
 }

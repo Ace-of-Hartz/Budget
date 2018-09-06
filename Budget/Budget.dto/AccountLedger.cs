@@ -10,5 +10,14 @@ namespace Budget.dto
         public decimal Transaction { get; set; }
         public DateTimeOffset TimeStamp { get; set; }
         public string Description { get; set; }
+
+        public AccountLedger() { }
+        public AccountLedger(AccountLedger accountLedger)
+        {
+            this.Id = accountLedger.Id;
+            this.Transaction = accountLedger.Transaction;
+            this.TimeStamp = accountLedger.TimeStamp;
+            this.Description = accountLedger.Description;
+        }
     }
 }
