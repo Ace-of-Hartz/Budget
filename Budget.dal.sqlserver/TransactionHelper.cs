@@ -14,7 +14,7 @@ namespace Budget.dal.sqlserver
         {
             get
             {
-                if (this.SqlConnection == null)
+                if (this._sqlConnection == null)
                 {
                     this.CreateSqlConnection();
                 }
@@ -36,11 +36,15 @@ namespace Budget.dal.sqlserver
         }
         private SqlTransaction _sqlTransaction;
 
-        public TransactionHelper() { }
+        public TransactionHelper(string connectionString)
+        {
+            this.SqlConnectionString = connectionString;
+        }
 
         public SqlConnection CreateSqlConnection()
         {
             this._sqlConnection = new SqlConnection(this.SqlConnectionString);
+            this._sqlConnection.Open();
             return this._sqlConnection;
         }
 

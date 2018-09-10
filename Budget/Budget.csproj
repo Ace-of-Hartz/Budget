@@ -1,13 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Budget.dal.i\Budget.dal.i.csproj" />
+    <ProjectReference Include="..\Budget.dal.sqlserver\Budget.dal.sqlserver.csproj" />
+    <ProjectReference Include="..\Budget.dto\Budget.dto.csproj" />
     <ProjectReference Include="..\Budget.model\Budget.model.csproj" />
     <ProjectReference Include="..\Budget.service.i\Budget.service.i.csproj" />
+    <ProjectReference Include="..\Budget.service\Budget.service.csproj" />
   </ItemGroup>
 
 </Project>

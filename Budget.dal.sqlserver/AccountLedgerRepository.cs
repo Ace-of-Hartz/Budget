@@ -9,22 +9,17 @@ namespace Budget.dal.sqlserver
 {
     public class AccountLedgerRepository : IAccountLedgerRepository
     {
-        private int _id;
-        private string _tableName;
         private TransactionHelper _transactionHelper;
 
-        public AccountLedgerRepository(int id, TransactionHelper transactionHelper)
+        public AccountLedgerRepository(TransactionHelper transactionHelper)
         {
-            this._id = id;
             this._transactionHelper = transactionHelper;
-
-            this._tableName = $"AccountLedger_{this._id}";
         }
 
-        public async Task AddLedgerEntryAsync(decimal transaction, string description = null)
+        public async Task AddLedgerEntryAsync(int accountId, decimal transaction, string description = null)
         {
             string sql = $@"
-INSERT INTO [{this._tableName}] ([Transaction], [Description])
+INSERT INTO [{this.GenerateTableName(accountId)}] ([Transaction], [Description])
 VALUES (@transaction, @description);
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
@@ -35,10 +30,10 @@ VALUES (@transaction, @description);
             }
         }
 
-        public async Task DeleteLedgerEntryAsync(long id)
+        public async Task DeleteLedgerEntryAsync(int accountId, long id)
         {
             string sql = $@"
-DELETE FROM [{this._tableName}]
+DELETE FROM [{this.GenerateTableName(accountId)}]
 WHERE [Id] = @id;
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
@@ -48,16 +43,16 @@ WHERE [Id] = @id;
             }
         }
 
-        public async Task<IEnumerable<AccountLedger>> GetEntriesBetweenDatesAsync(DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<AccountLedger>> GetEntriesBetweenDatesAsync(int accountId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             string sql = $@"
 SELECT [Id], [Transaction], [Timestamp], [Description]
-FROM [{this._tableName}]
+FROM [{this.GenerateTableName(accountId)}]
 WHERE [Timestamp] >= @startDate
 AND [Timestamp] <= @endDate
 ORDER BY [Id];
 ";
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection))
+            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@startDate", startDate));
                 command.Parameters.Add(new SqlParameter("@endDate", endDate));
@@ -68,14 +63,14 @@ ORDER BY [Id];
             }
         }
 
-        public async Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int lastX)
+        public async Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int accountId, int lastX)
         {
             string sql = $@"
 SELECT TOP (@numRows) [Id], [Transaction], [Timestamp], [Description]
-FROM [{this._tableName}]
+FROM [{this.GenerateTableName(accountId)}]
 ORDER BY [Id];
 ";
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection))
+            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@numRows", lastX));
                 using (var reader = await command.ExecuteReaderAsync())
@@ -85,10 +80,10 @@ ORDER BY [Id];
             }
         }
 
-        public async Task UpdateDescriptionAsync(long id, string description)
+        public async Task UpdateDescriptionAsync(int accountId, long id, string description)
         {
             string sql = $@"
-UPDATE [{this._tableName}]
+UPDATE [{this.GenerateTableName(accountId)}]
 SET [Description] = @description
 WHERE [Id] = @id;
 ";
@@ -100,21 +95,24 @@ WHERE [Id] = @id;
             }
         }
 
-        public async Task UpdateLedgerEntryAsync(long id, decimal transaction, string description)
+        public async Task UpdateLedgerEntryAsync(int accountId, long id, decimal transaction)
         {
             string sql = $@"
-UPDATE [{this._tableName}]
-SET [Transaction] = @transaction,
-    [Description] = @description
+UPDATE [{this.GenerateTableName(accountId)}]
+SET [Transaction] = @transaction
 WHERE [Id] = @id;
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@id", id));
                 command.Parameters.Add(new SqlParameter("@transaction", transaction));
-                command.Parameters.Add(new SqlParameter("@description", description));
                 await command.ExecuteNonQueryAsync();
             }
+        }
+
+        private string GenerateTableName(int accountId)
+        {
+            return $"AccountLedger_{accountId}";
         }
     }
 }

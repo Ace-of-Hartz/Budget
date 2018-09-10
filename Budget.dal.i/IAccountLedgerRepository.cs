@@ -8,13 +8,13 @@ namespace Budget.dal.i
 {
     public interface IAccountLedgerRepository
     {
-        Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int lastX);
-        Task<IEnumerable<AccountLedger>> GetEntriesBetweenDatesAsync(DateTimeOffset startDate, DateTimeOffset endDate);
+        Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int accountId, int lastX);
+        Task<IEnumerable<AccountLedger>> GetEntriesBetweenDatesAsync(int accountId, DateTimeOffset startDate, DateTimeOffset endDate);
 
-        Task AddLedgerEntryAsync(decimal transaction, string description);
-        Task UpdateLedgerEntryAsync(long id, decimal transaction, string description);
-        Task DeleteLedgerEntryAsync(long id);
+        Task AddLedgerEntryAsync(int accountId, decimal transaction, string description);
+        Task UpdateLedgerEntryAsync(int accountId, long id, decimal transaction);
+        Task DeleteLedgerEntryAsync(int accountId, long id);
 
-        Task UpdateDescriptionAsync(long id, string description);
+        Task UpdateDescriptionAsync(int accountId, long id, string description);
     }
 }

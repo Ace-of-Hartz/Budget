@@ -19,7 +19,7 @@ namespace Budget.dal.sqlserver
 
         public async Task AddTagAsync(int accountId, string tag, string description)
         {
-            string sql = $@"
+            string sql = @"
 INSERT INTO [Tags] ( [AccountId], [Tag], [Description] )
 VALUES ( @accountId, @tag, @description )
 ";
@@ -35,7 +35,7 @@ VALUES ( @accountId, @tag, @description )
 
         public async Task<IEnumerable<Tags>> GetTagsAsync()
         {
-            string sql = $@"
+            string sql = @"
 SELECT [Id], [AccountId], [Tag], [Description]
 FROM [Tags];
 ";
@@ -49,7 +49,7 @@ FROM [Tags];
 
         public async Task<IEnumerable<Tags>> GetTagsForAccountAsync(int accountId)
         {
-            string sql = $@"
+            string sql = @"
 SELECT [Id], [AccountId], [Tag], [Description]
 FROM [Tags]
 WHERE [AccountId] = @accountId;
