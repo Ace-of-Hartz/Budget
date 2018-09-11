@@ -1,4 +1,5 @@
 ﻿using Budget.dal.i;
+using Budget.dal.sqlserver;
 using Budget.model;
 using Budget.service.i;
 using System.Collections.Generic;
@@ -9,32 +10,28 @@ namespace Budget.service
 {
     public class AccountService : IAccountService
     {
-        private ITransactionHelper _transactionHelper;
-        private IAccountRepository _accountRepository;
-        private IAccountLedgerRepository _accountLedgerRepository;
-        private ITagsRepository _tagsRepository;
+        private IRepositoryService _repositoryService;
 
-        public AccountService(
-            ITransactionHelper transactionHelper,
-            IAccountRepository accountRepository,
-            IAccountLedgerRepository accountLedgerRepository,
-            ITagsRepository tagsRepository)
+        public AccountService(IRepositoryService repositoryService)
         {
-            this._transactionHelper = transactionHelper;
-            this._accountRepository = accountRepository;
-            this._accountLedgerRepository = accountLedgerRepository;
-            this._tagsRepository = tagsRepository;
+            this._repositoryService = repositoryService;
         }
 
         public async Task<IEnumerable<Account>> GetAccountsAsync()
         {
-            using (this._transactionHelper.CreateSqlConnection())
+            IEnumerable<dto.Tags> tags = new dto.Tags[0];
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
-                IEnumerable<dto.Tags> tags = await this._tagsRepository.GetTagsAsync();
-                IEnumerable<model.Account> accounts = (await this._accountRepository.GetAccountsAsync()).Select(a => new model.Account(a));
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+                tags = (await tagsRepository.GetTagsAsync()).ToList();
+            }
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                IEnumerable<model.Account> accounts = (await accountRepository.GetAccountsAsync()).Select(a => new model.Account(a)).ToList();
                 foreach (var account in accounts)
                 {
-                    account.Tags = tags.Where(t => t.AccountId == account.Id);
+                    account.Tags = tags.Where(t => t.AccountId == account.Id).ToList();
                 }
                 return accounts;
             }
@@ -42,62 +39,135 @@ namespace Budget.service
 
         public async Task<Account> GetAccountAsync(int id, int numEntries = 1000)
         {
-            using (this._transactionHelper.CreateSqlConnection())
+            Account account;
+            IEnumerable<dto.Tags> tags = new dto.Tags[0];
+            IEnumerable<model.AccountLedger> accountLedgers = new model.AccountLedger[0];
+
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
-                model.Account account = new model.Account(await this._accountRepository.GetAccountAsync(id));
-                account.Tags = await this._tagsRepository.GetTagsForAccountAsync(id);
-                account.LedgerEntries = (await this._accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new model.AccountLedger(e) { Account = account });
-                return account;
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+                tags = (await tagsRepository.GetTagsForAccountAsync(id)).ToList();
             }
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                account = new model.Account(await accountRepository.GetAccountAsync(id));
+            }
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                accountLedgers = (await accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new model.AccountLedger(e) { Account = account }).ToList();
+            }
+            account.Tags = tags;
+            account.LedgerEntries = accountLedgers;
+            return account;
         }
 
         public async Task<Account> CreateAccountAsync(string name, string description)
         {
-            await this._accountRepository.CreateAccountAsync(name, description);
-            return new Account(await this._accountRepository.GetLastAccountAsync());
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                await accountRepository.CreateAccountAsync(name, description);
+                Account newAccount = new Account(await accountRepository.GetLastAccountAsync());
+                transactionHelper.CommitTransaction();
+                return newAccount;
+            }
         }
 
         public async Task RenameAccountAsync(int id, string name)
         {
-            await this._accountRepository.RenameAccountAsync(id, name);
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                await accountRepository.RenameAccountAsync(id, name);
+                transactionHelper.CommitTransaction();
+            }
         }
 
         public async Task UpdateDescriptionAsync(int id, string description)
         {
-            await this._accountRepository.UpdateDescriptionAsync(id, description);
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                await accountRepository.UpdateDescriptionAsync(id, description);
+                transactionHelper.CommitTransaction();
+            }
         }
 
         public async Task DeleteAccountAsync(int id)
         {
-            await this._accountRepository.DeleteAccountAsync(id);
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                await accountRepository.DeleteAccountAsync(id);
+                transactionHelper.CommitTransaction();
+            }
         }
 
         public async Task AddTagAsync(int id, string tag, string description)
         {
-            await this._tagsRepository.AddTagAsync(id, tag, description);
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+                await tagsRepository.AddTagAsync(id, tag, description);
+                transactionHelper.CommitTransaction();
+            }
         }
 
         public async Task RemoveTagAsync(int tagId)
         {
-            await this._tagsRepository.RemoveTagAsync(tagId);
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+                await tagsRepository.RemoveTagAsync(tagId);
+                transactionHelper.CommitTransaction();
+            }
         }
 
         public async Task<Account> DepositeMoneyAsync(int id, decimal transaction, string description)
         {
-            await this._accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
-            return new Account(await this._accountRepository.GetAccountAsync(id));
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+
+                await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
+                Account account = new Account(await accountRepository.GetAccountAsync(id));
+                transactionHelper.CommitTransaction();
+                return account;
+            }
         }
 
         public async Task<Account> WithdrawMoneyAsync(int id, decimal transaction, string description)
         {
-            await this._accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
-            return new Account(await this._accountRepository.GetAccountAsync(id));
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+
+                await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
+                Account account = new Account(await accountRepository.GetAccountAsync(id));
+                transactionHelper.CommitTransaction();
+                return account;
+            }
         }
 
         public async Task<Account> UpdateTransactionAsync(int accountId, long transactionId, decimal transaction)
         {
-            await this._accountLedgerRepository.UpdateLedgerEntryAsync(accountId, transactionId, transaction);
-            return new Account(await this._accountRepository.GetAccountAsync(accountId));
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+
+                await accountLedgerRepository.UpdateLedgerEntryAsync(accountId, transactionId, transaction);
+                Account account = new Account(await accountRepository.GetAccountAsync(accountId));
+                transactionHelper.CommitTransaction();
+                return account;
+            }
         }
     }
 }

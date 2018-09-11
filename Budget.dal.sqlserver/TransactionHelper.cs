@@ -8,6 +8,7 @@ namespace Budget.dal.sqlserver
 {
     public class TransactionHelper : ITransactionHelper
     {
+        public bool IsDisposed { get; private set; }
         public string SqlConnectionString { get; private set; }
 
         public SqlConnection SqlConnection
@@ -36,6 +37,9 @@ namespace Budget.dal.sqlserver
         }
         private SqlTransaction _sqlTransaction;
 
+        public SqlCommand SqlCommand { get; set; }
+        public SqlDataReader SqlDataReader { get; set; }
+
         public TransactionHelper(string connectionString)
         {
             this.SqlConnectionString = connectionString;
@@ -50,16 +54,12 @@ namespace Budget.dal.sqlserver
 
         public SqlTransaction BeginTransaction()
         {
-            if (this.SqlConnection == null) { this.CreateSqlConnection(); }
-
             this._sqlTransaction = this.SqlConnection.BeginTransaction();
             return this._sqlTransaction;
         }
 
         public SqlTransaction BeginTransaction(string transactionName)
         {
-            if (this.SqlConnection == null) { this.CreateSqlConnection(); }
-
             if (string.IsNullOrWhiteSpace(transactionName)) { this.BeginTransaction(); }
             else { this._sqlTransaction = this.SqlConnection.BeginTransaction(transactionName); }
             return this._sqlTransaction;
@@ -77,9 +77,15 @@ namespace Budget.dal.sqlserver
 
         public void Dispose()
         {
-            this.SqlTransaction?.Dispose();
-            this.SqlConnection?.Dispose();
+            this.IsDisposed = true;
 
+            this.SqlDataReader?.Dispose();
+            this.SqlCommand?.Dispose();
+            this._sqlTransaction?.Dispose();
+            this._sqlConnection?.Dispose();
+
+            this.SqlDataReader = null;
+            this.SqlCommand = null;
             this._sqlTransaction = null;
             this._sqlConnection = null;
         }

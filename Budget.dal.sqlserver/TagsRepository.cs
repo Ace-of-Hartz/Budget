@@ -10,9 +10,9 @@ namespace Budget.dal.sqlserver
 {
     public class TagsRepository : ITagsRepository
     {
-        private TransactionHelper _transactionHelper;
+        private ITransactionHelper _transactionHelper;
 
-        public TagsRepository(TransactionHelper transactionHelper)
+        public TagsRepository(ITransactionHelper transactionHelper)
         {
             this._transactionHelper = transactionHelper;
         }
@@ -23,7 +23,6 @@ namespace Budget.dal.sqlserver
 INSERT INTO [Tags] ( [AccountId], [Tag], [Description] )
 VALUES ( @accountId, @tag, @description )
 ";
-
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@accountId", accountId));
@@ -39,12 +38,9 @@ VALUES ( @accountId, @tag, @description )
 SELECT [Id], [AccountId], [Tag], [Description]
 FROM [Tags];
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection))
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                return reader.GetDtos<Tags>();
-            }
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection);
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<Tags>();
         }
 
         public async Task<IEnumerable<Tags>> GetTagsForAccountAsync(int accountId)
@@ -54,15 +50,10 @@ SELECT [Id], [AccountId], [Tag], [Description]
 FROM [Tags]
 WHERE [AccountId] = @accountId;
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection))
-            {
-                command.Parameters.Add(new SqlParameter("@accountId", accountId));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<Tags>();
-                }
-            }
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection);
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@accountId", accountId));
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<Tags>();
         }
 
         public async Task<IEnumerable<Tags>> GetTagsThatContainAsync(string tag)
@@ -72,15 +63,10 @@ SELECT [Id], [AccountId], [Tag], [Description]
 FROM [Tags]
 WHERE [Tag] like '%' + @tag + '%';
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection))
-            {
-                command.Parameters.Add(new SqlParameter("@tag", tag));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<Tags>();
-                }
-            }
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection);
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@tag", tag));
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<Tags>();
         }
 
         public async Task RemoveTagAsync(int id)

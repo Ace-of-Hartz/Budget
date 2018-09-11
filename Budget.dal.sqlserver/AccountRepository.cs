@@ -11,9 +11,9 @@ namespace Budget.dal.sqlserver
 {
     public class AccountRepository : IAccountRepository
     {
-        private TransactionHelper _transactionHelper;
+        private ITransactionHelper _transactionHelper;
 
-        public AccountRepository(TransactionHelper transactionHelper)
+        public AccountRepository(ITransactionHelper transactionHelper)
         {
             this._transactionHelper = transactionHelper;
         }
@@ -24,13 +24,12 @@ namespace Budget.dal.sqlserver
 INSERT INTO [Account] ( [Name], [Description] )
 VALUES ( @name, @description );
 ";
-
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
-                command.Parameters.Add(new SqlParameter("@name", name));
-                command.Parameters.Add(new SqlParameter("@description", description));
-                await command.ExecuteNonQueryAsync();
-            }        
+                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@name", name));
+                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@description", description));
+                await _transactionHelper.SqlCommand.ExecuteNonQueryAsync();
+            }
         }
 
         public async Task DeleteAccountAsync(int id)
@@ -39,11 +38,11 @@ VALUES ( @name, @description );
 DELETE FROM [Account]
 WERE [Id] = @id;
 ";
-
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
-                command.Parameters.Add(new SqlParameter("@id", id));
-                await command.ExecuteNonQueryAsync();
+                _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@id", id));
+                await _transactionHelper.SqlCommand.ExecuteNonQueryAsync();
             }
         }
 
@@ -54,12 +53,9 @@ SELECT TOP 1 [ID], [Name], [Money], [Description]
 From [Account]
 ORDER BY [ID] DESC
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                return reader.GetDtos<Account>().FirstOrDefault();
-            }
+            _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return _transactionHelper.SqlDataReader.GetDtos<Account>().FirstOrDefault();
         }
 
         public async Task<Account> GetAccountAsync(int id)
@@ -69,15 +65,10 @@ SELECT TOP 1 [Id], [Name], [Money], [Description]
 FROM [Account]
 WHERE [Id] = @id;
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            {
-                command.Parameters.Add(new SqlParameter("@id", id));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<Account>().FirstOrDefault();
-                }
-            }
+            _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@id", id));
+            _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return _transactionHelper.SqlDataReader.GetDtos<Account>().FirstOrDefault();
         }
 
         public async Task<IEnumerable<Account>> GetAccountsAsync()
@@ -86,12 +77,9 @@ WHERE [Id] = @id;
 SELECT [Id], [Name], [Money], [Description]
 FROM [Account];
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                return reader.GetDtos<Account>();
-            }
+            _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return _transactionHelper.SqlDataReader.GetDtos<Account>();
         }
 
         public async Task<IEnumerable<Account>> GetAccountsByNameAsync(string name)
@@ -101,15 +89,10 @@ SELECT [Id], [Name], [Money], [Description]
 FROM [Account]
 WHERE [Name] = @name;
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            {
-                command.Parameters.Add(new SqlParameter("@name", name));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<Account>();
-                }
-            }
+            _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@name", name));
+            _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return _transactionHelper.SqlDataReader.GetDtos<Account>();
         }
 
         public async Task<IEnumerable<Account>> GetAccountsByTagAsync(string tag)
@@ -121,15 +104,10 @@ JOIN [Tags] [T]
  ON [T].[AccountId] = [A].[Id]
  AND [T].[Tag] = @tag;
 ";
-
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            {
-                command.Parameters.Add(new SqlParameter("@tag", tag));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<Account>();
-                }
-            }
+            _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@tag", tag));
+            _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return _transactionHelper.SqlDataReader.GetDtos<Account>();
         }
 
         public async Task RenameAccountAsync(int id, string name)
@@ -139,7 +117,6 @@ UPDATE [Account]
 SET [Name] = @name
 WHERE [Id] = @id;
 ";
-
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@name", name));
@@ -155,7 +132,6 @@ UPDATE [Account]
 SET [Description] = @description
 WHERE [Id] = @id;
 ";
-
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@description", description));

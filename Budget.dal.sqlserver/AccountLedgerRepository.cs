@@ -9,9 +9,9 @@ namespace Budget.dal.sqlserver
 {
     public class AccountLedgerRepository : IAccountLedgerRepository
     {
-        private TransactionHelper _transactionHelper;
+        private ITransactionHelper _transactionHelper;
 
-        public AccountLedgerRepository(TransactionHelper transactionHelper)
+        public AccountLedgerRepository(ITransactionHelper transactionHelper)
         {
             this._transactionHelper = transactionHelper;
         }
@@ -52,15 +52,11 @@ WHERE [Timestamp] >= @startDate
 AND [Timestamp] <= @endDate
 ORDER BY [Id];
 ";
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            {
-                command.Parameters.Add(new SqlParameter("@startDate", startDate));
-                command.Parameters.Add(new SqlParameter("@endDate", endDate));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<AccountLedger>();
-                }
-            }
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@startDate", startDate));
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@endDate", endDate));
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<AccountLedger>();
         }
 
         public async Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int accountId, int lastX)
@@ -70,14 +66,10 @@ SELECT TOP (@numRows) [Id], [Transaction], [Timestamp], [Description]
 FROM [{this.GenerateTableName(accountId)}]
 ORDER BY [Id];
 ";
-            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
-            {
-                command.Parameters.Add(new SqlParameter("@numRows", lastX));
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    return reader.GetDtos<AccountLedger>();
-                }
-            }
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@numRows", lastX));
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<AccountLedger>();
         }
 
         public async Task UpdateDescriptionAsync(int accountId, long id, string description)

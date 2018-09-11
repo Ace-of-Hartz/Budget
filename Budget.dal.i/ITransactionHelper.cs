@@ -7,9 +7,12 @@ namespace Budget.dal.i
 {
     public interface ITransactionHelper : IDisposable
     {
+        bool IsDisposed { get; }
         string SqlConnectionString { get; }
         SqlConnection SqlConnection { get; }
         SqlTransaction SqlTransaction { get; }
+        SqlCommand SqlCommand { get; set; }
+        SqlDataReader SqlDataReader { get; set; }
 
         SqlConnection CreateSqlConnection();
         SqlTransaction BeginTransaction();
