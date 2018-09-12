@@ -2,6 +2,7 @@
 using Budget.dal.sqlserver;
 using Budget.model;
 using Budget.service.i;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,14 +54,52 @@ namespace Budget.service
                 var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
                 account = new model.Account(await accountRepository.GetAccountAsync(id));
             }
-            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            if (numEntries > 0)
             {
-                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                accountLedgers = (await accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new model.AccountLedger(e) { Account = account }).ToList();
+                using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+                {
+                    var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                    accountLedgers = (await accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new model.AccountLedger(e, id)).ToList();
+                }
             }
             account.Tags = tags;
             account.LedgerEntries = accountLedgers;
             return account;
+        }
+
+        public async Task<Account> GetAccountAsync(int id, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            Account account;
+            IEnumerable<dto.Tags> tags = new dto.Tags[0];
+            IEnumerable<model.AccountLedger> accountLedgers = new model.AccountLedger[0];
+
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+                tags = (await tagsRepository.GetTagsForAccountAsync(id)).ToList();
+            }
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                account = new model.Account(await accountRepository.GetAccountAsync(id));
+            }
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                accountLedgers = (await accountLedgerRepository.GetEntriesBetweenDatesAsync(id, startDate, endDate)).Select(e => new AccountLedger(e, id)).ToList();
+            }
+            account.Tags = tags;
+            account.LedgerEntries = accountLedgers;
+            return account;
+        }
+
+        public async Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int accountId, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                return (await accountLedgerRepository.GetEntriesBetweenDatesAsync(accountId, startDate, endDate)).Select(e => new AccountLedger(e, accountId)).ToList();
+            }
         }
 
         public async Task<Account> CreateAccountAsync(string name, string description)
@@ -142,6 +181,7 @@ namespace Budget.service
 
         public async Task<Account> WithdrawMoneyAsync(int id, decimal transaction, string description)
         {
+            if(transaction > 0) { transaction *= -1;  }
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);

@@ -26,9 +26,9 @@ VALUES ( @name, @description );
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
-                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@name", name));
-                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@description", description));
-                await _transactionHelper.SqlCommand.ExecuteNonQueryAsync();
+                command.Parameters.Add(new SqlParameter("@name", name));
+                command.Parameters.Add(new SqlParameter("@description", description));
+                await command.ExecuteNonQueryAsync();
             }
         }
 
@@ -40,9 +40,8 @@ WERE [Id] = @id;
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
-                _transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
-                _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@id", id));
-                await _transactionHelper.SqlCommand.ExecuteNonQueryAsync();
+                command.Parameters.Add(new SqlParameter("@id", id));
+                await command.ExecuteNonQueryAsync();
             }
         }
 

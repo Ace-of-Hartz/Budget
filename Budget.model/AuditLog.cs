@@ -7,6 +7,6 @@ namespace Budget.model
     public class AuditLog : dto.AuditLog
     {
         public AuditActions AuditAction { get; set; }
-        public IEnumerable<AccountLedger> LedgerEntries { get; set; }
+        public IEnumerable<dto.AccountLedger> LedgerEntries { get; set; }
     }
 }

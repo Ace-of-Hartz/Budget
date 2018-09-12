@@ -67,11 +67,13 @@ namespace Budget.dal.sqlserver
 
         public void RollbackTransactaction()
         {
+            this.SqlDataReader?.Dispose();
             this.SqlTransaction?.Rollback();
         }
 
         public void CommitTransaction()
         {
+            this.SqlDataReader?.Dispose();
             this.SqlTransaction?.Commit();
         }
 

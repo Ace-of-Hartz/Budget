@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.service", "Budget.se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.service.i", "Budget.service.i\Budget.service.i.csproj", "{0450D2BE-E832-4204-82EC-96D5A2015E7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget.Api.Dependencies", "Budget.Api.Dependencies\Budget.Api.Dependencies.csproj", "{E592D66C-CE98-4367-86C3-57B6F31ABADA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Budget.Api.Dependencies", "Budget.Api.Dependencies\Budget.Api.Dependencies.csproj", "{E592D66C-CE98-4367-86C3-57B6F31ABADA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Budget.Api.Models", "Budget.Api.models\Budget.Api.Models.csproj", "{732BEA4D-54E7-4A6B-96CA-ADC7B92B65F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{E592D66C-CE98-4367-86C3-57B6F31ABADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E592D66C-CE98-4367-86C3-57B6F31ABADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E592D66C-CE98-4367-86C3-57B6F31ABADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{732BEA4D-54E7-4A6B-96CA-ADC7B92B65F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{732BEA4D-54E7-4A6B-96CA-ADC7B92B65F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{732BEA4D-54E7-4A6B-96CA-ADC7B92B65F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{732BEA4D-54E7-4A6B-96CA-ADC7B92B65F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

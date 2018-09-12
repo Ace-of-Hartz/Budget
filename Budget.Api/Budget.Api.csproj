@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Budget.Api.Dependencies\Budget.Api.Dependencies.csproj" />
+    <ProjectReference Include="..\Budget.Api.models\Budget.Api.Models.csproj" />
     <ProjectReference Include="..\Budget.dal.i\Budget.dal.i.csproj" />
     <ProjectReference Include="..\Budget.dal.sqlserver\Budget.dal.sqlserver.csproj" />
     <ProjectReference Include="..\Budget.service.i\Budget.service.i.csproj" />
