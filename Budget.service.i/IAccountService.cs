@@ -23,8 +23,8 @@ namespace Budget.service.i
 
         Task<Account> DepositeMoneyAsync(int accountId, decimal money, string description);
         Task<Account> WithdrawMoneyAsync(int accountId, decimal money, string description);
-        Task<Account> UpdateTransactionAmount(int accountId, long transactionId, decimal money);
-        Task<Account> UpdateTransactionDescription(int accountId, long transactionId, string description);
-        Task<Account> DeleteTransaction(int accountId, long transactionId);
+        Task UpdateTransactionAmountAsync(int accountId, long transactionId, decimal money);
+        Task UpdateTransactionDescriptionAsync(int accountId, long transactionId, string description);
+        Task DeleteTransactionAsync(int accountId, long transactionId);
     }
 }

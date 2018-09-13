@@ -168,45 +168,62 @@ namespace Budget.service
         {
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
-                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
                 var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
 
                 await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
-                Account account = new Account(await accountRepository.GetAccountAsync(id));
                 transactionHelper.CommitTransaction();
-                return account;
             }
+            return await this.GetAccountAsync(id, 100);
         }
 
         public async Task<Account> WithdrawMoneyAsync(int id, decimal transaction, string description)
         {
-            if(transaction > 0) { transaction *= -1;  }
+            if (transaction > 0) { transaction *= -1; }
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
-                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
                 var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
 
                 await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
-                Account account = new Account(await accountRepository.GetAccountAsync(id));
                 transactionHelper.CommitTransaction();
-                return account;
             }
+            return await this.GetAccountAsync(id, 100);
         }
 
-        public async Task<Account> UpdateTransactionAsync(int accountId, long transactionId, decimal transaction)
+        public async Task UpdateTransactionAmountAsync(int accountId, long transactionId, decimal transaction)
         {
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
-                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
                 var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
 
                 await accountLedgerRepository.UpdateLedgerEntryAsync(accountId, transactionId, transaction);
-                Account account = new Account(await accountRepository.GetAccountAsync(accountId));
                 transactionHelper.CommitTransaction();
-                return account;
+            }
+        }
+
+        public async Task UpdateTransactionDescriptionAsync(int accountId, long transactionId, string description)
+        {
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+
+                await accountLedgerRepository.UpdateDescriptionAsync(accountId, transactionId, description);
+                transactionHelper.CommitTransaction();
+            }
+        }
+
+        public async Task DeleteTransactionAsync(int accountId, long tranactionId)
+        {
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
+
+                await accountLedgerRepository.DeleteLedgerEntryAsync(accountId, tranactionId);
+                transactionHelper.CommitTransaction();
             }
         }
     }

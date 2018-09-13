@@ -99,5 +99,26 @@ namespace Budget.Api.Controllers
         {
             return Ok(await RepositoryServiceProvider.AccountService.WithdrawMoneyAsync(id, transaction.Money, transaction.Description));
         }
+
+        [HttpPut("{id}/transactions/{transactionId}/amount")]
+        public async Task<ActionResult> UpdateTransactionAmountAsync(int id, long transactionId, TransactionRequest transaction)
+        {
+            await RepositoryServiceProvider.AccountService.UpdateTransactionAmountAsync(id, transactionId, transaction.Money);
+            return Ok();
+        }
+
+        [HttpPut("{id}/transactions/{transactionId}/description")]
+        public async Task<ActionResult> UpdateTransactionDescriptionAsync(int id, long transactionId, TransactionRequest transaction)
+        {
+            await RepositoryServiceProvider.AccountService.UpdateTransactionDescriptionAsync(id, transactionId, transaction.Description);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/transactions/{transactionId}")]
+        public async Task<ActionResult> DeleteTransactionAsync(int id, long transactionId)
+        {
+            await RepositoryServiceProvider.AccountService.DeleteTransactionAsync(id, transactionId);
+            return Ok();
+        }
     }
 }
