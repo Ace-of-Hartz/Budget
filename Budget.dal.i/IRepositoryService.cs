@@ -10,5 +10,6 @@ namespace Budget.dal.i
         IAccountRepository GetAccountRepository(ITransactionHelper transactionHelper);
         IAccountLedgerRepository GetAccountLedgerRepository(ITransactionHelper transactionHelper);
         ITagsRepository GetTagsRepository(ITransactionHelper transactionHelper);
+        IPaycheckRepository GetPaycheckRepository(ITransactionHelper transactionHelper);
     }
 }

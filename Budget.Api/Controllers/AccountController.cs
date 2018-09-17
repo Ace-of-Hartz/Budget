@@ -88,16 +88,10 @@ namespace Budget.Api.Controllers
             return Ok(await accountService.GetAccountAsync(id, 0));
         }
 
-        [HttpPost("{id}/transactions/deposite")]
-        public async Task<ActionResult<Account>> DepositeMoneyAsync(int id, [FromBody] TransactionRequest transaction)
-        {
-            return Ok(await RepositoryServiceProvider.AccountService.DepositeMoneyAsync(id, transaction.Money, transaction.Description));
-        }
-
-        [HttpPost("{id}/transactions/withdraw")]
+        [HttpPost("{id}/transactions")]
         public async Task<ActionResult<Account>> WithdrawMoneyAsync(int id, [FromBody] TransactionRequest transaction)
-        {
-            return Ok(await RepositoryServiceProvider.AccountService.WithdrawMoneyAsync(id, transaction.Money, transaction.Description));
+        {           
+            return Ok(await RepositoryServiceProvider.AccountService.AddTransactionAsync(id, transaction.PaycheckId, transaction.Money, transaction.Description, transaction.TransactionType));
         }
 
         [HttpPut("{id}/transactions/{transactionId}/amount")]

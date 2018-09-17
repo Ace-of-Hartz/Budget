@@ -7,6 +7,7 @@ namespace Budget.dto
     public class AccountLedger
     {
         public long Id { get; set; }
+        public int? PaycheckId { get; set; }
         public decimal Transaction { get; set; }
         public DateTimeOffset TimeStamp { get; set; }
         public string Description { get; set; }
@@ -15,6 +16,7 @@ namespace Budget.dto
         public AccountLedger(AccountLedger accountLedger)
         {
             this.Id = accountLedger.Id;
+            this.PaycheckId = accountLedger.PaycheckId;
             this.Transaction = accountLedger.Transaction;
             this.TimeStamp = accountLedger.TimeStamp;
             this.Description = accountLedger.Description;

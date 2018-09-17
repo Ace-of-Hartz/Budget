@@ -1,4 +1,5 @@
-﻿using Budget.model;
+﻿using Budget.Api.Models.AccountModels;
+using Budget.model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Budget.service.i
         Task<Account> GetAccountAsync(int id, DateTimeOffset startDate, DateTimeOffset endDate);
 
         Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int id, DateTimeOffset startDate, DateTimeOffset endDate);
+        Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int id, int? paycheckId);
 
         Task<Account> CreateAccountAsync(string name, string description);
         Task RenameAccountAsync(int id, string name);
@@ -21,8 +23,7 @@ namespace Budget.service.i
         Task AddTagAsync(int accountId, string tag, string description);
         Task RemoveTagAsync(int id);
 
-        Task<Account> DepositeMoneyAsync(int accountId, decimal money, string description);
-        Task<Account> WithdrawMoneyAsync(int accountId, decimal money, string description);
+        Task<Account> AddTransactionAsync(int accountId, int? paycheckId, decimal money, string description, TransactionType transactionType);
         Task UpdateTransactionAmountAsync(int accountId, long transactionId, decimal money);
         Task UpdateTransactionDescriptionAsync(int accountId, long transactionId, string description);
         Task DeleteTransactionAsync(int accountId, long transactionId);

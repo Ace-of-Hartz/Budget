@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Budget.Api.models\Budget.Api.Models.csproj" />
     <ProjectReference Include="..\Budget.model\Budget.model.csproj" />
   </ItemGroup>
 

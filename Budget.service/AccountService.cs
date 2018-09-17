@@ -29,7 +29,7 @@ namespace Budget.service
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
-                IEnumerable<model.Account> accounts = (await accountRepository.GetAccountsAsync()).Select(a => new model.Account(a)).ToList();
+                IEnumerable<Account> accounts = (await accountRepository.GetAccountsAsync()).Select(a => new Account(a)).ToList();
                 foreach (var account in accounts)
                 {
                     account.Tags = tags.Where(t => t.AccountId == account.Id).ToList();
@@ -42,7 +42,7 @@ namespace Budget.service
         {
             Account account;
             IEnumerable<dto.Tags> tags = new dto.Tags[0];
-            IEnumerable<model.AccountLedger> accountLedgers = new model.AccountLedger[0];
+            IEnumerable<AccountLedger> accountLedgers = new AccountLedger[0];
 
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
@@ -52,14 +52,14 @@ namespace Budget.service
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
-                account = new model.Account(await accountRepository.GetAccountAsync(id));
+                account = new Account(await accountRepository.GetAccountAsync(id));
             }
             if (numEntries > 0)
             {
                 using (var transactionHelper = this._repositoryService.GetTransactionHelper())
                 {
                     var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                    accountLedgers = (await accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new model.AccountLedger(e, id)).ToList();
+                    accountLedgers = (await accountLedgerRepository.GetLastNumEntriesAsync(id, numEntries)).Select(e => new AccountLedger(e, id)).ToList();
                 }
             }
             account.Tags = tags;
@@ -71,7 +71,7 @@ namespace Budget.service
         {
             Account account;
             IEnumerable<dto.Tags> tags = new dto.Tags[0];
-            IEnumerable<model.AccountLedger> accountLedgers = new model.AccountLedger[0];
+            IEnumerable<AccountLedger> accountLedgers = new AccountLedger[0];
 
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
@@ -164,28 +164,27 @@ namespace Budget.service
             }
         }
 
-        public async Task<Account> DepositeMoneyAsync(int id, decimal transaction, string description)
+        public async Task<Account> AddTransactionAsync(int id, int? paycheckId, decimal transaction, string description, TransactionType transactionType)
         {
+            if (transactionType == TransactionType.Deposite && transaction < 0) { transaction *= -1; }
+            else if (transactionType == TransactionType.Withdraw && transaction > 0) { transaction *= -1; }
+
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
-
-                await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
+                await accountLedgerRepository.AddLedgerEntryAsync(id, paycheckId, transaction, description);
                 transactionHelper.CommitTransaction();
             }
             return await this.GetAccountAsync(id, 100);
         }
 
-        public async Task<Account> WithdrawMoneyAsync(int id, decimal transaction, string description)
+        public async Task<Account> WithdrawMoneyAsync(int id, int? paycheckId, decimal transaction, string description)
         {
             if (transaction > 0) { transaction *= -1; }
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
-
-                await accountLedgerRepository.AddLedgerEntryAsync(id, transaction, description);
+                await accountLedgerRepository.AddLedgerEntryAsync(id, paycheckId, transaction, description);
                 transactionHelper.CommitTransaction();
             }
             return await this.GetAccountAsync(id, 100);
@@ -196,8 +195,6 @@ namespace Budget.service
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
-
                 await accountLedgerRepository.UpdateLedgerEntryAsync(accountId, transactionId, transaction);
                 transactionHelper.CommitTransaction();
             }
@@ -208,8 +205,6 @@ namespace Budget.service
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
-
                 await accountLedgerRepository.UpdateDescriptionAsync(accountId, transactionId, description);
                 transactionHelper.CommitTransaction();
             }
@@ -220,10 +215,17 @@ namespace Budget.service
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
-                var tagsRepository = this._repositoryService.GetTagsRepository(transactionHelper);
-
                 await accountLedgerRepository.DeleteLedgerEntryAsync(accountId, tranactionId);
                 transactionHelper.CommitTransaction();
+            }
+        }
+
+        public async Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int id, int? paycheckId)
+        {
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountLedgerRepository = this._repositoryService.GetAccountLedgerRepository(transactionHelper);
+                return (await accountLedgerRepository.GetPaycheckEntriesAsync(id, paycheckId)).Select(p => new AccountLedger(p, id)).ToList();
             }
         }
     }

@@ -16,14 +16,15 @@ namespace Budget.dal.sqlserver
             this._transactionHelper = transactionHelper;
         }
 
-        public async Task AddLedgerEntryAsync(int accountId, decimal transaction, string description = null)
+        public async Task AddLedgerEntryAsync(int accountId, int? paycheckId, decimal transaction, string description = null)
         {
             string sql = $@"
-INSERT INTO [{this.GenerateTableName(accountId)}] ([Transaction], [Description])
-VALUES (@transaction, @description);
+INSERT INTO [{this.GenerateTableName(accountId)}] ([PaycheckId], [Transaction], [Description])
+VALUES (@paycheckId, @transaction, @description);
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
+                command.Parameters.Add(new SqlParameter("@paycheckId", paycheckId));
                 command.Parameters.Add(new SqlParameter("@transaction", transaction));
                 command.Parameters.Add(new SqlParameter("@description", description));
                 await command.ExecuteNonQueryAsync();
@@ -46,7 +47,7 @@ WHERE [Id] = @id;
         public async Task<IEnumerable<AccountLedger>> GetEntriesBetweenDatesAsync(int accountId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             string sql = $@"
-SELECT [Id], [Transaction], [Timestamp], [Description]
+SELECT [Id], [PaycheckId], [Transaction], [Timestamp], [Description]
 FROM [{this.GenerateTableName(accountId)}]
 WHERE [Timestamp] >= @startDate
 AND [Timestamp] <= @endDate
@@ -62,12 +63,26 @@ ORDER BY [Id];
         public async Task<IEnumerable<AccountLedger>> GetLastNumEntriesAsync(int accountId, int lastX)
         {
             string sql = $@"
-SELECT TOP (@numRows) [Id], [Transaction], [Timestamp], [Description]
+SELECT TOP (@numRows) [Id], [PaycheckId], [Transaction], [Timestamp], [Description]
 FROM [{this.GenerateTableName(accountId)}]
 ORDER BY [Id];
 ";
             this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
             this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@numRows", lastX));
+            this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
+            return this._transactionHelper.SqlDataReader.GetDtos<AccountLedger>();
+        }
+
+        public async Task<IEnumerable<AccountLedger>> GetPaycheckEntriesAsync(int accountId, int? paycheckId)
+        {
+            string sql = $@"
+SELECT [Id], [PaycheckId], [Transaction], [Timestamp], [Description]
+FROM [{this.GenerateTableName(accountId)}]
+WHERE [PaycheckId] = @paycheckId
+ORDER BY [Id];
+";
+            this._transactionHelper.SqlCommand = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction);
+            this._transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@paycheckId", paycheckId));
             this._transactionHelper.SqlDataReader = await this._transactionHelper.SqlCommand.ExecuteReaderAsync();
             return this._transactionHelper.SqlDataReader.GetDtos<AccountLedger>();
         }

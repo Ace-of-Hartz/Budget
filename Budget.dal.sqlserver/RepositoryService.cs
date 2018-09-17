@@ -17,20 +17,21 @@ namespace Budget.dal.sqlserver
         {
             return new TransactionHelper(this._connectionString);
         }
-
         public IAccountLedgerRepository GetAccountLedgerRepository(ITransactionHelper transactionHelper)
         {
             return new AccountLedgerRepository(transactionHelper);
         }
-
         public IAccountRepository GetAccountRepository(ITransactionHelper transactionHelper)
         {
             return new AccountRepository(transactionHelper);
         }
-
         public ITagsRepository GetTagsRepository(ITransactionHelper transactionHelper)
         {
             return new TagsRepository(transactionHelper);
+        }
+        public IPaycheckRepository GetPaycheckRepository(ITransactionHelper transactionHelper)
+        {
+            return new PaycheckRepository(transactionHelper);
         }
     }
 }

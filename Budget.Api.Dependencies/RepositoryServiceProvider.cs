@@ -21,5 +21,6 @@ namespace Budget.Api.Dependencies
 
         public static IRepositoryService RepositoryService => new RepositoryService(RepositoryServiceProvider.SqlConnection);
         public static IAccountService AccountService => new AccountService(RepositoryService);
+        public static IPaycheckService PaycheckService => new PaycheckService(RepositoryService);
     }
 }
