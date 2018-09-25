@@ -15,7 +15,7 @@ namespace Budget.Api.Controllers
     public class PaycheckController : Controller
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Paycheck>>> GetPaychecksAsync(int id)
+        public async Task<ActionResult<IEnumerable<Paycheck>>> GetPaychecksAsync()
         {
             DateTime dateTime = new DateTime(DateTime.Now.Year, 1, 1);
             return Ok(await RepositoryServiceProvider.PaycheckService.GetPaychecksBetweenAsync(dateTime, DateTime.Now));
