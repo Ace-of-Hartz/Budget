@@ -13,6 +13,7 @@ namespace Budget.service.i
         Task<IEnumerable<Paycheck>> GetPaychecksBetweenAsync(DateTime startDate, DateTime endDate);
 
         Task<Paycheck> CreatePaycheckAsync(decimal money, DateTime paydate);
+        Task UpdatePaycheckAsync(Paycheck paycheck);
         Task UpdatePaycheckAmountAsync(int id, decimal money);
         Task UpdatePaycheckUnallocatedAsync(int id, decimal unallocatedMoney);
         Task UpdatePaycheckDateAsync(int id, DateTime paydate);

@@ -8,9 +8,16 @@ namespace Budget.model
     {
         public new long PayDate { get; set; }
 
+        public Paycheck() : base() { }
         public Paycheck(dto.Paycheck paycheck)
-            : base(paycheck) {
+            : base(paycheck)
+        {
             this.PayDate = base.PayDate.ToEpoch();
+        }
+
+        public void SetBaseDate()
+        {
+            base.PayDate = this.PayDate.FromEpoch();
         }
     }
 }

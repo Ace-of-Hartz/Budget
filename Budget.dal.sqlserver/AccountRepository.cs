@@ -18,15 +18,16 @@ namespace Budget.dal.sqlserver
             this._transactionHelper = transactionHelper;
         }
 
-        public async Task CreateAccountAsync(string name, string description)
+        public async Task CreateAccountAsync(string name, decimal money, string description)
         {
             string sql = @"
-INSERT INTO [Account] ( [Name], [Description] )
-VALUES ( @name, @description );
+INSERT INTO [Account] ( [Name], [money], [Description] )
+VALUES ( @name, @money, @description );
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
                 command.Parameters.Add(new SqlParameter("@name", name));
+                command.Parameters.Add(new SqlParameter("@money", money));
                 command.Parameters.Add(new SqlParameter("@description", description));
                 await command.ExecuteNonQueryAsync();
             }
@@ -107,6 +108,25 @@ JOIN [Tags] [T]
             _transactionHelper.SqlCommand.Parameters.Add(new SqlParameter("@tag", tag));
             _transactionHelper.SqlDataReader = await _transactionHelper.SqlCommand.ExecuteReaderAsync();
             return _transactionHelper.SqlDataReader.GetDtos<Account>();
+        }
+
+        public async Task UpdateAccountAsync(Account account)
+        {
+            string sql = @"
+UPDATE [Account]
+SET [Name] = @name,
+    [Money] = @money,
+    [Description] = @description
+WHERE [Id] = @id;
+";
+            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
+            {
+                command.Parameters.Add(new SqlParameter("@name", account.Name));
+                command.Parameters.Add(new SqlParameter("@money", account.Money));
+                command.Parameters.Add(new SqlParameter("@description", account.Description));
+                command.Parameters.Add(new SqlParameter("@id", account.Id));
+                await command.ExecuteNonQueryAsync();
+            }
         }
 
         public async Task RenameAccountAsync(int id, string name)

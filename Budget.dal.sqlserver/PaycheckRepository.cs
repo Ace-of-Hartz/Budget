@@ -99,6 +99,25 @@ ORDER BY [Paydate] DESC
             return _transactionHelper.SqlDataReader.GetDtos<Paycheck>();
         }
 
+        public async Task UpdatePaycheckAsync(Paycheck paycheck)
+        {
+            string sql = @"
+UPDATE [Paycheck]
+SET [Money] = @money,
+    [UnallocatedMoney] = @unallocatedMoney,
+    [PayDate] = @payDate
+WHERE [Id] = @id;
+";
+            using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
+            {
+                command.Parameters.Add(new SqlParameter("@money", paycheck.Money));
+                command.Parameters.Add(new SqlParameter("@unallocatedMoney", paycheck.UnallocatedMoney));
+                command.Parameters.Add(new SqlParameter("@payDate", paycheck.PayDate));
+                command.Parameters.Add(new SqlParameter("@id", paycheck.Id));
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
         public async Task UpdatePaycheckAmountAsync(int id, decimal money)
         {
             string sql = @"

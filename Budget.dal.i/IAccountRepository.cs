@@ -14,7 +14,8 @@ namespace Budget.dal.i
         Task<IEnumerable<Account>> GetAccountsByTagAsync(string tag);
         Task<IEnumerable<Account>> GetAccountsByNameAsync(string name);
 
-        Task CreateAccountAsync(string name, string description);
+        Task CreateAccountAsync(string name, decimal money, string description);
+        Task UpdateAccountAsync(Account account);
         Task RenameAccountAsync(int id, string name);
         Task UpdateDescriptionAsync(int id, string description);
         Task DeleteAccountAsync(int id);

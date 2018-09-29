@@ -10,6 +10,7 @@ namespace Budget.model
         public IEnumerable<Tags> Tags { get; set; } = new Tags[0];
         public IEnumerable<AccountLedger> LedgerEntries { get; set; } = new AccountLedger[0];
 
+        public Account() : base() { }
         public Account(dto.Account baseAccount)
             : base(baseAccount) { }
     }

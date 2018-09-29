@@ -67,6 +67,16 @@ namespace Budget.service
             }
         }
 
+        public async Task UpdatePaycheckAsync(Paycheck paycheck)
+        {
+            using (ITransactionHelper transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var paycheckRepository = this._repositoryService.GetPaycheckRepository(transactionHelper);
+                await paycheckRepository.UpdatePaycheckAsync(paycheck);
+                transactionHelper.CommitTransaction();
+            }
+        }
+
         public async Task UpdatePaycheckAmountAsync(int id, decimal money)
         {
             using (ITransactionHelper transactionHelper = this._repositoryService.GetTransactionHelper())

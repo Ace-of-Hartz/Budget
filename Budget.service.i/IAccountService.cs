@@ -15,7 +15,8 @@ namespace Budget.service.i
         Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int id, DateTimeOffset startDate, DateTimeOffset endDate);
         Task<IEnumerable<AccountLedger>> GetAccountLedgerEntriesAsync(int id, int? paycheckId);
 
-        Task<Account> CreateAccountAsync(string name, string description);
+        Task<Account> CreateAccountAsync(string name, decimal initialFunds, string description);
+        Task UpdateAccountAsync(Account account);
         Task RenameAccountAsync(int id, string name);
         Task UpdateDescriptionAsync(int id, string description);
         Task DeleteAccountAsync(int id);

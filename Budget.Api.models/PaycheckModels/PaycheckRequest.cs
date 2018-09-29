@@ -7,6 +7,6 @@ namespace Budget.Api.Models.PaycheckModels
     public class PaycheckRequest
     {
         public decimal Money { get; set; }
-        public DateTime PayDate { get; set; }
+        public long PayDate { get; set; }
     }
 }

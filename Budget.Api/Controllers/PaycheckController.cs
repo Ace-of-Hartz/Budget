@@ -30,13 +30,22 @@ namespace Budget.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Paycheck>> CreatePaycheckAsync([FromBody] PaycheckRequest paycheckRequest)
         {
-            return Ok(await RepositoryServiceProvider.PaycheckService.CreatePaycheckAsync(paycheckRequest.Money, paycheckRequest.PayDate));
+            return Ok(await RepositoryServiceProvider.PaycheckService.CreatePaycheckAsync(paycheckRequest.Money, paycheckRequest.PayDate.FromEpoch()));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdatePaycheckAsync(int id, [FromBody] Paycheck paycheckRequest)
+        {
+            paycheckRequest.Id = id;
+            paycheckRequest.SetBaseDate();
+            await RepositoryServiceProvider.PaycheckService.UpdatePaycheckAsync(paycheckRequest);
+            return Ok();
         }
 
         [HttpPut("{id}/paydate")]
         public async Task<ActionResult> UpdatePaycheckPaydateAsync(int id, [FromBody]PaycheckRequest paycheckRequest)
         {
-            await RepositoryServiceProvider.PaycheckService.UpdatePaycheckDateAsync(id, paycheckRequest.PayDate);
+            await RepositoryServiceProvider.PaycheckService.UpdatePaycheckDateAsync(id, paycheckRequest.PayDate.FromEpoch());
             return Ok();
         }
 

@@ -46,7 +46,15 @@ namespace Budget.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Account>> CreateAccountAsync([FromBody] AccountRequest account)
         {
-            return Ok(await RepositoryServiceProvider.AccountService.CreateAccountAsync(account.Name, account.Description));
+            return Ok(await RepositoryServiceProvider.AccountService.CreateAccountAsync(account.Name, account.Money, account.Description));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateAccountAsync(int id, [FromBody] Account account)
+        {
+            account.Id = id;
+            await RepositoryServiceProvider.AccountService.UpdateAccountAsync(account);
+            return Ok();
         }
 
         [HttpPut("{id}/name")]

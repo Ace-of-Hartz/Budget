@@ -102,15 +102,25 @@ namespace Budget.service
             }
         }
 
-        public async Task<Account> CreateAccountAsync(string name, string description)
+        public async Task<Account> CreateAccountAsync(string name, decimal money, string description)
         {
             using (var transactionHelper = this._repositoryService.GetTransactionHelper())
             {
                 var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
-                await accountRepository.CreateAccountAsync(name, description);
+                await accountRepository.CreateAccountAsync(name, money, description);
                 Account newAccount = new Account(await accountRepository.GetLastAccountAsync());
                 transactionHelper.CommitTransaction();
                 return newAccount;
+            }
+        }
+
+        public async Task UpdateAccountAsync(Account account)
+        {
+            using (var transactionHelper = this._repositoryService.GetTransactionHelper())
+            {
+                var accountRepository = this._repositoryService.GetAccountRepository(transactionHelper);
+                await accountRepository.UpdateAccountAsync(account);
+                transactionHelper.CommitTransaction();
             }
         }
 

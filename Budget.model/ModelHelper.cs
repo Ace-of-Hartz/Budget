@@ -12,5 +12,10 @@ namespace Budget.model
         {
             return (long)(dateTime - EPOCH_START).TotalMilliseconds;
         }
+
+        public static DateTime FromEpoch(this long millisecondsFromEpoch)
+        {
+            return EPOCH_START.AddMilliseconds(millisecondsFromEpoch);
+        }
     }
 }

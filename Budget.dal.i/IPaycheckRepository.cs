@@ -14,6 +14,7 @@ namespace Budget.dal.i
         Task<IEnumerable<Paycheck>> GetPaychecksBetweenAsync(DateTimeOffset startDate, DateTimeOffset endDate);
         
         Task CreatePaycheckAsync(decimal money, DateTimeOffset paydate);
+        Task UpdatePaycheckAsync(Paycheck paycheck);
         Task UpdatePaycheckAmountAsync(int id, decimal money);
         Task UpdatePaycheckUnallocatedAsync(int id, decimal unallocatedMoney);
         Task UpdatePaycheckDateAsync(int id, DateTimeOffset paydate);
