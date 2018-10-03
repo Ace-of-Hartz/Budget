@@ -34,15 +34,6 @@ namespace Budget.Api.Controllers
             return Ok(await RepositoryServiceProvider.AccountService.GetAccountAsync(id, startDate.Value, endDate.Value));
         }
 
-        [HttpGet("{id}/entries")]
-        public async Task<ActionResult<IEnumerable<AccountLedger>>> GetAccountLedgersAsync(int id, [FromQuery] DateTimeOffset? startDate, [FromQuery] DateTimeOffset? endDate)
-        {
-            startDate = startDate ?? DateTimeOffset.Now.AddDays(-90);
-            endDate = endDate ?? DateTimeOffset.Now;
-            // TODO add -90 to config values
-            return Ok(await RepositoryServiceProvider.AccountService.GetAccountLedgerEntriesAsync(id, startDate.Value, endDate.Value));
-        }
-
         [HttpPost]
         public async Task<ActionResult<Account>> CreateAccountAsync([FromBody] AccountRequest account)
         {
@@ -94,6 +85,15 @@ namespace Budget.Api.Controllers
             IAccountService accountService = RepositoryServiceProvider.AccountService;
             await accountService.RemoveTagAsync(tagId);
             return Ok(await accountService.GetAccountAsync(id, 0));
+        }
+
+        [HttpGet("{id}/transactions")]
+        public async Task<ActionResult<IEnumerable<AccountLedger>>> GetAccountLedgersAsync(int id, [FromQuery] DateTimeOffset? startDate, [FromQuery] DateTimeOffset? endDate)
+        {
+            startDate = startDate ?? DateTimeOffset.Now.AddDays(-90);
+            endDate = endDate ?? DateTimeOffset.Now;
+            // TODO add -90 to config values
+            return Ok(await RepositoryServiceProvider.AccountService.GetAccountLedgerEntriesAsync(id, startDate.Value, endDate.Value));
         }
 
         [HttpPost("{id}/transactions")]
