@@ -37,7 +37,7 @@ VALUES ( @name, @money, @description );
         {
             string sql = @"
 DELETE FROM [Account]
-WERE [Id] = @id;
+WHERE [Id] = @id;
 ";
             using (var command = new SqlCommand(sql, this._transactionHelper.SqlConnection, this._transactionHelper.SqlTransaction))
             {
